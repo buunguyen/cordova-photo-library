@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+  id="com.buunguyen.PhotoLibrary"
+  version="0.1.0">
+
+  <name>PhotoLibrary</name>
+  <author>Buu Nguyen</author>
+
+  <description>
+    This plugin supports saving images to photo library.
+    Currently support iOS only.
+  </description>
+  <keywords>photo library,images</keywords>
+
+  <license>MIT</license>
+  <repo>https://github.com/buunguyen/cordova-photo-library.git</repo>
+
+  <engines>
+    <engine name="cordova" version=">=3.0.0" />
+  </engines>
+
+  <js-module src="www/PhotoLibrary.js" name="PhotoLibrary">
+    <clobbers target="cordova.plugins.PhotoLibrary" />
+  </js-module>
+
+  <platform name="ios">
+    <config-file target="config.xml" parent="/*">
+      <feature name="PhotoLibrary">
+        <param name="ios-package" value="PhotoLibrary" onload="true" />
+      </feature>
+    </config-file>
+
+    <header-file src="src/ios/PhotoLibrary.h" />
+    <source-file src="src/ios/PhotoLibrary.m" compiler-flags="-fno-objc-arc" />
+  </platform>
+</plugin>
