@@ -18,6 +18,10 @@ PhotoLibrary.fromImage = function (img, successCallback, failureCallback) {
 
   ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight)
 
+  return PhotoLibrary.fromCanvas(canvas)
+}
+
+PhotoLibrary.fromCanvas = function (canvas, successCallback, failureCallback) {
   var base64Str = canvas.toDataURL().replace(/data:image\/png;base64,/,'')
   return PhotoLibrary.fromBase64(base64Str, successCallback, failureCallback)
 }
