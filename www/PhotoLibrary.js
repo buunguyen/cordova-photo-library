@@ -1,10 +1,9 @@
-function noop() {}
-
 function PhotoLibrary() {}
 
 PhotoLibrary.fromImage = function (img, successCallback, failureCallback) {
   if (!img.complete) {
-    return (failureCallback || noop)('Image has not been loaded')
+    failureCallback && failureCallback('Image has not been loaded')
+    return
   }
 
   var canvas = document.createElement('canvas')
@@ -24,11 +23,11 @@ PhotoLibrary.fromImage = function (img, successCallback, failureCallback) {
 }
 
 PhotoLibrary.fromBase64 = function (base64Str, successCallback, failureCallback) {
-  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'fromBase64', [base64Str]);
+  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'fromBase64', [base64Str])
 }
 
 PhotoLibrary.fromUrl = function (imageUrl, successCallback, failureCallback) {
-  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'fromUrl', [imageUrl]);
+  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'fromUrl', [imageUrl])
 }
 
 module.exports = PhotoLibrary

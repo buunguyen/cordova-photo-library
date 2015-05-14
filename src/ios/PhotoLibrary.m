@@ -6,6 +6,7 @@
 @end
 
 @implementation PhotoLibrary
+
 @synthesize callbackId;
 
 - (void)fromBase64:(CDVInvokedUrlCommand*)command
@@ -14,7 +15,6 @@
 
   NSString *base64Str = [NSString stringWithFormat:@"data:;base64,%@", [command.arguments objectAtIndex:0]];
   NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:base64Str]];
-
   UIImage *image = [UIImage imageWithData:data];
   [self save:image];
 }
@@ -24,7 +24,6 @@
   self.callbackId = command.callbackId;
 
   NSString* imageUrl = [command.arguments objectAtIndex:0];
-
   UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:imageUrl]]];
   [self save:image];
 }
@@ -39,7 +38,8 @@
   CDVPluginResult* result = error == NULL
     ? [CDVPluginResult resultWithStatus: CDVCommandStatus_OK]
     : [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
-  [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+
+  [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
 }
 
 - (void)dealloc
