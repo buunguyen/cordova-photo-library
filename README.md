@@ -13,4 +13,5 @@ Methods
 * cordova.plugins.PhotoLibrary.fromImage(img, callback, errback) // img must have been loaded
 * cordova.plugins.PhotoLibrary.fromCanvas(canvas, callback, errback)
 * cordova.plugins.PhotoLibrary.fromBase64(base64String, callback, errback)
-* cordova.plugins.PhotoLibrary.fromUrl(url, callback, errback)
+* cordova.plugins.PhotoLibrary.fromUrl(options, callback, errback)
+where options = {imageUrl: url, albumName: albumName}
