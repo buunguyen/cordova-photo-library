@@ -20,7 +20,7 @@
   NSString *base64Str = [NSString stringWithFormat:@"data:;base64,%@", [command.arguments objectAtIndex:0]];
   NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:base64Str]];
   UIImage *image = [UIImage imageWithData:data];
-  [self save:image];
+    [self save:image];
 }
 
 - (void)fromUrl:(CDVInvokedUrlCommand*)command
@@ -30,19 +30,15 @@
   NSString* imageUrl = [command.arguments objectAtIndex:0];
   NSString* albumName = [command.arguments objectAtIndex:1];
   UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:imageUrl]]];
-  [self save:image];
+  [self save:image albumName:albumName];
 }
 
-- (void)save:(UIImage *)image
+- (void)save:(UIImage *)image{
+    UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+}
+
+- (void)save:(UIImage *)image albumName:(NSString*)albumName
 {
-    /*UIAlertView * alert =[[UIAlertView alloc ] initWithTitle:@"OK Dailog"
-                                                     message:@"This is OK dialog"
-                                                    delegate:self
-                                           cancelButtonTitle:@"Cancel"
-                                           otherButtonTitles: nil];
-    [alert show];*/
- 
-    //__block NSString* albumName = @"GetFace";
     
     self.library = [[ALAssetsLibrary alloc] init];
     [self.library addAssetsGroupAlbumWithName:albumName resultBlock:^(ALAssetsGroup *group) {
