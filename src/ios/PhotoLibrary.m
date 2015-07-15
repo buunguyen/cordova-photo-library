@@ -1,7 +1,11 @@
 #import "PhotoLibrary.h"
+#import <AssetsLibrary/AssetsLibrary.h>
 #import <Cordova/CDV.h>
 
 @interface PhotoLibrary()
+
+@property (strong, nonatomic) ALAssetsLibrary* library;
+
 - (void)save:(UIImage *)image;
 @end
 
@@ -24,13 +28,78 @@
   self.callbackId = command.callbackId;
 
   NSString* imageUrl = [command.arguments objectAtIndex:0];
+  NSString* albumName = [command.arguments objectAtIndex:1];
   UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:imageUrl]]];
   [self save:image];
 }
 
 - (void)save:(UIImage *)image
 {
-  UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
+    /*UIAlertView * alert =[[UIAlertView alloc ] initWithTitle:@"OK Dailog"
+                                                     message:@"This is OK dialog"
+                                                    delegate:self
+                                           cancelButtonTitle:@"Cancel"
+                                           otherButtonTitles: nil];
+    [alert show];*/
+ 
+    //__block NSString* albumName = @"GetFace";
+    
+    self.library = [[ALAssetsLibrary alloc] init];
+    [self.library addAssetsGroupAlbumWithName:albumName resultBlock:^(ALAssetsGroup *group) {
+        
+        ///checks if group previously created
+        if(group == nil){
+            
+            //enumerate albums
+            [self.library enumerateGroupsWithTypes:ALAssetsGroupAlbum
+                               usingBlock:^(ALAssetsGroup *g, BOOL *stop)
+             {
+                 //if the album is equal to our album
+                 if ([[g valueForProperty:ALAssetsGroupPropertyName] isEqualToString:albumName]) {
+                     
+                     //save image
+                     [self.library writeImageDataToSavedPhotosAlbum:UIImagePNGRepresentation(image) metadata:nil
+                                           completionBlock:^(NSURL *assetURL, NSError *error) {
+                                               
+                                               //then get the image asseturl
+                                               [self.library assetForURL:assetURL
+                                                    resultBlock:^(ALAsset *asset) {
+                                                        //put it into our album
+                                                        [g addAsset:asset];
+                                                        [self image:image didFinishSavingWithError:nil contextInfo:nil];
+                                                    } failureBlock:^(NSError *error) {
+                                                        [self image:image didFinishSavingWithError:error contextInfo:nil];
+                                                    }];
+                                           }];
+                     
+                 }
+             }failureBlock:^(NSError *error){
+                 [self image:image didFinishSavingWithError:error contextInfo:nil];
+             }];
+            
+        }else{
+            // save image directly to library
+            [self.library writeImageDataToSavedPhotosAlbum:UIImagePNGRepresentation(image) metadata:nil
+                                  completionBlock:^(NSURL *assetURL, NSError *error) {
+                                      
+                                      [self.library assetForURL:assetURL
+                                           resultBlock:^(ALAsset *asset) {
+                                               
+                                               [group addAsset:asset];
+                                               [self image:image didFinishSavingWithError:nil contextInfo:nil];
+                                               
+                                           } failureBlock:^(NSError *error) {
+                                               [self image:image didFinishSavingWithError:error contextInfo:nil];
+                                           }];
+                                  }];
+        }
+        
+    } failureBlock:^(NSError *error) {
+        [self image:image didFinishSavingWithError:error contextInfo:nil];
+    }];
+    
+    
+ // UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
 }
 
 - (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo
