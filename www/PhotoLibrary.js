@@ -27,7 +27,7 @@ PhotoLibrary.fromCanvas = function (canvas, successCallback, failureCallback) {
 }
 
 PhotoLibrary.fromBase64 = function (base64Str, successCallback, failureCallback) {
-  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'fromBase64', [base64Str])
+  return PhotoLibrary.fromUrl('data:;base64,' + base64Str, successCallback, failureCallback)
 }
 
 PhotoLibrary.fromUrl = function (imageUrl, successCallback, failureCallback) {

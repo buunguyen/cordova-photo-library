@@ -1,51 +1,39 @@
 #import "PhotoLibrary.h"
 #import <Cordova/CDV.h>
+#import <AssetsLibrary/AssetsLibrary.h>
 
 @interface PhotoLibrary()
-- (void)save:(UIImage *)image;
+- (void) save:(NSString *) imageUrl;
 @end
 
 @implementation PhotoLibrary
 
 @synthesize callbackId;
 
-- (void)fromBase64:(CDVInvokedUrlCommand*)command
+- (void)fromUrl:(CDVInvokedUrlCommand *) command
 {
-  self.callbackId = command.callbackId;
-
-  NSString *base64Str = [NSString stringWithFormat:@"data:;base64,%@", [command.arguments objectAtIndex:0]];
-  NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:base64Str]];
-  UIImage *image = [UIImage imageWithData:data];
-  [self save:image];
+    self.callbackId = command.callbackId;
+    NSString* imageUrl = [command.arguments objectAtIndex:0];
+    [self save:imageUrl];
 }
 
-- (void)fromUrl:(CDVInvokedUrlCommand*)command
+- (void)save:(NSString *) imageUrl
 {
-  self.callbackId = command.callbackId;
+    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:imageUrl]];
+    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+    [library writeImageDataToSavedPhotosAlbum:data metadata:nil completionBlock:^(NSURL *assetURL, NSError *error) {
+        CDVPluginResult *result = error == NULL
+            ? [CDVPluginResult resultWithStatus: CDVCommandStatus_OK]
+            : [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
 
-  NSString* imageUrl = [command.arguments objectAtIndex:0];
-  UIImage* image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:imageUrl]]];
-  [self save:image];
-}
-
-- (void)save:(UIImage *)image
-{
-  UIImageWriteToSavedPhotosAlbum(image, self, @selector(image:didFinishSavingWithError:contextInfo:), nil);
-}
-
-- (void)image:(UIImage *)image didFinishSavingWithError:(NSError *)error contextInfo:(void *)contextInfo
-{
-  CDVPluginResult* result = error == NULL
-    ? [CDVPluginResult resultWithStatus: CDVCommandStatus_OK]
-    : [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
-
-  [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+        [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+    }];
 }
 
 - (void)dealloc
 {
-  [callbackId release];
-  [super dealloc];
+    [callbackId release];
+    [super dealloc];
 }
 
 @end
