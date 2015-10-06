@@ -2,13 +2,13 @@
 
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
   id="com.buunguyen.PhotoLibrary"
-  version="0.1.0">
+  version="0.2.0">
 
   <name>PhotoLibrary</name>
   <author>Buu Nguyen</author>
 
   <description>
-    This plugin supports saving images to photo library.
+    This plugin supports saving images and videos to photo library.
     Currently support iOS only.
   </description>
   <keywords>photo library,images</keywords>
