@@ -14,8 +14,9 @@
 
     ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
     [library writeImageDataToSavedPhotosAlbum:data metadata:nil completionBlock:^(NSURL *assetURL, NSError *error) {
+        NSString *assetUrlString = assetURL.absoluteString;
         CDVPluginResult *result = error == NULL
-            ? [CDVPluginResult resultWithStatus: CDVCommandStatus_OK]
+            ? [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsString:assetUrlString]
             : [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
 
         [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
@@ -36,9 +37,9 @@
     if ([library videoAtPathIsCompatibleWithSavedPhotosAlbum:pathUrl]) {
         [library writeVideoAtPathToSavedPhotosAlbum:pathUrl completionBlock:^(NSURL *assetURL, NSError *error) {
             [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
-
+            NSString *assetUrlString = assetURL.absoluteString;
             CDVPluginResult *result = error == NULL
-                ? [CDVPluginResult resultWithStatus: CDVCommandStatus_OK]
+                ? [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsString:assetUrlString]
                 : [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
 
             [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
