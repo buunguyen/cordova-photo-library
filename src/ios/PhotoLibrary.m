@@ -1,3 +1,4 @@
+
 #import "PhotoLibrary.h"
 #import <Cordova/CDV.h>
 #import <AssetsLibrary/AssetsLibrary.h>
@@ -10,17 +11,44 @@
 {
     self.callbackId = command.callbackId;
     NSString* url = [command.arguments objectAtIndex:0];
+    NSString* albumName = [command.arguments objectAtIndex:1];
     NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
 
     ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-    [library writeImageDataToSavedPhotosAlbum:data metadata:nil completionBlock:^(NSURL *assetURL, NSError *error) {
-        NSString *assetUrlString = assetURL.absoluteString;
-        CDVPluginResult *result = error == NULL
-            ? [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsString:assetUrlString]
-            : [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
+    [library addAssetsGroupAlbumWithName:@"My Photo Album" resultBlock:^(ALAssetsGroup *group) {
+        if(group == nil){
+                //enumerate albums
+                [library enumerateGroupsWithTypes:ALAssetsGroupAlbum
+                                   usingBlock:^(ALAssetsGroup *g, BOOL *stop)
+                 {
+                     //if the album is equal to our album
+                     if ([[g valueForProperty:ALAssetsGroupPropertyName] isEqualToString:@"My Photo Album"]) {
 
-        [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
-    }];
+                         //save image
+                        [library writeImageDataToSavedPhotosAlbum:data metadata:nil completionBlock:^(NSURL *assetURL, NSError *error) {
+                            NSString *assetUrlString = assetURL.absoluteString;
+                            CDVPluginResult *result = error == NULL
+                                ? [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsString:assetUrlString]
+                                : [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
+
+                            [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+                        }];
+                     }
+                 }failureBlock:^(NSError *error){
+
+                 }];
+        }else {
+            [library writeImageDataToSavedPhotosAlbum:data metadata:nil completionBlock:^(NSURL *assetURL, NSError *error) {
+                NSString *assetUrlString = assetURL.absoluteString;
+                CDVPluginResult *result = error == NULL
+                    ? [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsString:assetUrlString]
+                    : [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
+
+                [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+            }];
+        }
+    }
+
 }
 
 - (void)videoFromUrl:(CDVInvokedUrlCommand *) command
