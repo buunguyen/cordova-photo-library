@@ -47,8 +47,7 @@
                 [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
             }];
         }
-    }
-
+    }];
 }
 
 - (void)videoFromUrl:(CDVInvokedUrlCommand *) command
