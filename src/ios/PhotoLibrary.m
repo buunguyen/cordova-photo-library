@@ -21,7 +21,7 @@
     NSString* url = [options objectForKey:@"url"];
     __block NSString* albumName = nil;
     if (![[options objectForKey:@"albumName"] isEqual:[NSNull null]]) {
-      albumName = [command.arguments objectAtIndex:1];
+      albumName = [options objectForKey:@"albumName"];
     }
     NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
     UIImage *image = [UIImage imageWithData:data];
@@ -37,7 +37,7 @@
     NSString* url = [options objectForKey:@"url"];
     __block NSString* albumName = nil;
     if (![[options objectForKey:@"albumName"] isEqual:[NSNull null]]) {
-      albumName = [command.arguments objectAtIndex:1];
+      albumName = [options objectForKey:@"albumName"];
     }
     NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
 
