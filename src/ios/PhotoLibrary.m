@@ -17,8 +17,12 @@
 - (void)imageFromUrl:(CDVInvokedUrlCommand *) command
 {
     self.callbackId = command.callbackId;
-    NSString* url = [command.arguments objectAtIndex:0];
-    NSString* albumName = [command.arguments objectAtIndex:1];
+    NSMutableDictionary *options = [command argumentAtIndex:0];
+    NSString* url = [options objectForKey:@"url"];
+    __block NSString* albumName = nil;
+    if (![[options objectForKey:@"albumName"] isEqual:[NSNull null]]) {
+      albumName = [command.arguments objectAtIndex:1];
+    }
     NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
     UIImage *image = [UIImage imageWithData:data];
 
@@ -29,8 +33,12 @@
 - (void)videoFromUrl:(CDVInvokedUrlCommand *) command
 {
     self.callbackId = command.callbackId;
-    NSString* url = [command.arguments objectAtIndex:0];
-    NSString* albumName = [command.arguments objectAtIndex:1];
+    NSMutableDictionary *options = [command argumentAtIndex:0];
+    NSString* url = [options objectForKey:@"url"];
+    __block NSString* albumName = nil;
+    if (![[options objectForKey:@"albumName"] isEqual:[NSNull null]]) {
+      albumName = [command.arguments objectAtIndex:1];
+    }
     NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
 
     NSString *path = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"file.mov"];
