@@ -33,6 +33,6 @@
 
     <header-file src="src/ios/PhotoLibrary.h" />
     <source-file src="src/ios/PhotoLibrary.m" compiler-flags="-fno-objc-arc" />
-    <framework src="AssetsLibrary.framework" />
+    <framework src="Photos.framework" />
   </platform>
 </plugin>

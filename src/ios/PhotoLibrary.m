@@ -1,7 +1,6 @@
 
 #import "PhotoLibrary.h"
 #import <Cordova/CDV.h>
-#import <AssetsLibrary/AssetsLibrary.h>
 #import <Photos/Photos.h>
 
 @implementation PhotoLibrary
