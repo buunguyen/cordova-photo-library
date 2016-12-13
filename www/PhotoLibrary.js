@@ -31,11 +31,11 @@ PhotoLibrary.imageFromBase64 = function (base64Str, successCallback, failureCall
 }
 
 PhotoLibrary.imageFromUrl = function (url, successCallback, failureCallback) {
-  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'imageFromUrl', [url])
+  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'imageFromUrl', [url], albumName)
 }
 
 PhotoLibrary.videoFromUrl = function (url, successCallback, failureCallback) {
-  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'videoFromUrl', [url])
+  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'videoFromUrl', [url], albumName)
 }
 
 module.exports = PhotoLibrary

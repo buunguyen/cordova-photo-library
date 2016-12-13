@@ -10,6 +10,37 @@
 @synthesize localId;
 
 
+- (void)sendResult:(NSString *)assetId {
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsString:assetId];
+    [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+}
+
+- (void)imageFromUrl:(CDVInvokedUrlCommand *) command
+{
+    self.callbackId = command.callbackId;
+    NSString* url = [command.arguments objectAtIndex:0];
+    NSString* albumName = [command.arguments objectAtIndex:1];
+    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
+    UIImage *image = [UIImage imageWithData:data];
+
+    [self insertVideoUrl:nil insertImage:image intoAlbumNamed: @"My Album" ];
+
+}
+
+- (void)videoFromUrl:(CDVInvokedUrlCommand *) command
+{
+    self.callbackId = command.callbackId;
+    NSString* url = [command.arguments objectAtIndex:0];
+    NSString* albumName = [command.arguments objectAtIndex:1];
+    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
+
+    NSString *path = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"file.mov"];
+    [data writeToFile:path atomically:YES];
+    NSURL *pathUrl = [NSURL fileURLWithPath:path];
+
+    [self insertVideoUrl:pathUrl insertImage:nil intoAlbumNamed: albumName];
+
+}
 - (void)insertVideoUrl:(NSURL*)videoUrl insertImage:(UIImage *)image intoAlbumNamed:(NSString *)albumName {
     //Fetch a collection in the photos library that has the title "albumName"
     PHAssetCollection *collection = [self fetchAssetCollectionWithAlbumName: albumName];
@@ -75,43 +106,11 @@
             [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
         }
         if (success){
-            [self returnToCordova:self.localId];
+            [self sendResult:self.localId];
         }
     }];
 }
 
-- (void)returnToCordova:(NSString *)assetId {
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus: CDVCommandStatus_OK messageAsString:assetId];
-    [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
-}
-
-
-
-- (void)imageFromUrl:(CDVInvokedUrlCommand *) command
-{
-    self.callbackId = command.callbackId;
-    NSString* url = [command.arguments objectAtIndex:0];
-    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
-    UIImage *image = [UIImage imageWithData:data];
-
-    [self insertVideoUrl:nil insertImage:image intoAlbumNamed: @"My Album" ];
-
-
-}
-
-- (void)videoFromUrl:(CDVInvokedUrlCommand *) command
-{
-    self.callbackId = command.callbackId;
-    NSString* url = [command.arguments objectAtIndex:0];
-    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
-
-    NSString *path = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"file.mov"];
-    [data writeToFile:path atomically:YES];
-    NSURL *pathUrl = [NSURL fileURLWithPath:path];
-
-    [self insertVideoUrl:pathUrl insertImage:nil intoAlbumNamed: @"My Album"];
-
-}
 
 - (void)dealloc
 {
