@@ -23,7 +23,7 @@
     NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
     UIImage *image = [UIImage imageWithData:data];
 
-    [self insertVideoUrl:nil insertImage:image intoAlbumNamed: @"My Album" ];
+    [self insertVideoUrl:nil insertImage:image intoAlbumNamed:albumName];
 
 }
 
@@ -38,7 +38,7 @@
     [data writeToFile:path atomically:YES];
     NSURL *pathUrl = [NSURL fileURLWithPath:path];
 
-    [self insertVideoUrl:pathUrl insertImage:nil intoAlbumNamed: albumName];
+    [self insertVideoUrl:pathUrl insertImage:nil intoAlbumNamed:albumName];
 
 }
 - (void)insertVideoUrl:(NSURL*)videoUrl insertImage:(UIImage *)image intoAlbumNamed:(NSString *)albumName {
