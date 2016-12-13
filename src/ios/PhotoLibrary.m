@@ -42,28 +42,32 @@
 
 }
 - (void)insertVideoUrl:(NSURL*)videoUrl insertImage:(UIImage *)image intoAlbumNamed:(NSString *)albumName {
-    //Fetch a collection in the photos library that has the title "albumName"
-    PHAssetCollection *collection = [self fetchAssetCollectionWithAlbumName: albumName];
-
-    if (collection == nil) {
-        //If we were unable to find a collection named "albumName" we'll create it before inserting the image
-        [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
-            [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle: albumName];
-        } completionHandler:^(BOOL success, NSError * _Nullable error) {
-            if (error != nil) {
-                NSLog(@"Error inserting media into album: %@", error.localizedDescription);
-                [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
-            }
-
-            if (success) {
-                //Fetch the newly created collection (which we *assume* exists here)
-                PHAssetCollection *newCollection = [self fetchAssetCollectionWithAlbumName:albumName];
-                [self insertVideoUrl:videoUrl insertImage:image intoAssetCollection: newCollection];
-            }
-        }];
+    if (albumName == nil) {
+        [self insertVideoUrl:videoUrl insertImage:image intoAssetCollection: nil];
     } else {
-        //If we found the existing AssetCollection with the title "albumName", insert into it
-        [self insertVideoUrl:videoUrl insertImage:image intoAssetCollection: collection];
+        //Fetch a collection in the photos library that has the title "albumName"
+        PHAssetCollection *collection = [self fetchAssetCollectionWithAlbumName: albumName];
+
+        if (collection == nil) {
+            //If we were unable to find a collection named "albumName" we'll create it before inserting the image
+            [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+                [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle: albumName];
+            } completionHandler:^(BOOL success, NSError * _Nullable error) {
+                if (error != nil) {
+                    NSLog(@"Error inserting media into album: %@", error.localizedDescription);
+                    [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
+                }
+
+                if (success) {
+                    //Fetch the newly created collection (which we *assume* exists here)
+                    PHAssetCollection *newCollection = [self fetchAssetCollectionWithAlbumName:albumName];
+                    [self insertVideoUrl:videoUrl insertImage:image intoAssetCollection: newCollection];
+                }
+            }];
+        } else {
+            //If we found the existing AssetCollection with the title "albumName", insert into it
+            [self insertVideoUrl:videoUrl insertImage:image intoAssetCollection: collection];
+        }
     }
 }
 
@@ -89,17 +93,18 @@
             creationRequest = [PHAssetCreationRequest creationRequestForAssetFromImage:image];
         }
 
-        //Create a change request to insert the new PHAsset in the collection
-        PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
-
         self.localId = [[creationRequest placeholderForCreatedAsset] localIdentifier];
 
-        NSLog(@"Local ID: %@", self.localId);
-        //Add the PHAsset placeholder into the creation request.
-        //The placeholder is used because the actual PHAsset hasn't been created yet
-        if (request != nil && creationRequest.placeholderForCreatedAsset != nil) {
-            [request addAssets: @[creationRequest.placeholderForCreatedAsset]];
+        if(collection != nil) {
+            //Create a change request to insert the new PHAsset in the collection
+            PHAssetCollectionChangeRequest *request = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:collection];
+            //Add the PHAsset placeholder into the creation request.
+            //The placeholder is used because the actual PHAsset hasn't been created yet
+            if (request != nil && creationRequest.placeholderForCreatedAsset != nil) {
+                [request addAssets: @[creationRequest.placeholderForCreatedAsset]];
+            }
         }
+
     } completionHandler:^(BOOL success, NSError * _Nullable error) {
         if (error != nil) {
             NSLog(@"Error inserting image into asset collection: %@", error.localizedDescription);
