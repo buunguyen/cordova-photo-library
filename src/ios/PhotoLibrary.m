@@ -16,41 +16,43 @@
 
 - (void)imageFromUrl:(CDVInvokedUrlCommand *) command
 {
-    self.callbackId = command.callbackId;
-    NSMutableDictionary *options = [command argumentAtIndex:0];
-    NSString* url = [options objectForKey:@"url"];
-    __block NSString* albumName = nil;
-    if (![[options objectForKey:@"albumName"] isEqual:[NSNull null]]) {
-      albumName = [options objectForKey:@"albumName"];
-    }
-    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
-    UIImage *image = [UIImage imageWithData:data];
+    [self.commandDelegate runInBackground:^{
+        self.callbackId = command.callbackId;
+        NSMutableDictionary *options = [command argumentAtIndex:0];
+        NSString* url = [options objectForKey:@"url"];
+        __block NSString* albumName = nil;
+        if (![[options objectForKey:@"albumName"] isEqual:[NSNull null]]) {
+            albumName = [options objectForKey:@"albumName"];
+        }
+        NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
+        UIImage *image = [UIImage imageWithData:data];
 
-    [self insertVideoUrl:nil insertImage:image intoAlbumNamed:albumName];
-
+        [self checkCollection:nil insertImage:image intoAlbumNamed:albumName];
+    }];
 }
 
 - (void)videoFromUrl:(CDVInvokedUrlCommand *) command
 {
-    self.callbackId = command.callbackId;
-    NSMutableDictionary *options = [command argumentAtIndex:0];
-    NSString* url = [options objectForKey:@"url"];
-    __block NSString* albumName = nil;
-    if (![[options objectForKey:@"albumName"] isEqual:[NSNull null]]) {
-      albumName = [options objectForKey:@"albumName"];
-    }
-    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
-
-    NSString *path = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"file.mov"];
-    [data writeToFile:path atomically:YES];
-    NSURL *pathUrl = [NSURL fileURLWithPath:path];
-
-    [self insertVideoUrl:pathUrl insertImage:nil intoAlbumNamed:albumName];
-
+    [self.commandDelegate runInBackground:^{
+        self.callbackId = command.callbackId;
+        NSMutableDictionary *options = [command argumentAtIndex:0];
+        NSString* url = [options objectForKey:@"url"];
+        __block NSString* albumName = nil;
+        if (![[options objectForKey:@"albumName"] isEqual:[NSNull null]]) {
+            albumName = [options objectForKey:@"albumName"];
+        }
+        NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
+        
+        NSString *path = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"file.mov"];
+        [data writeToFile:path atomically:YES];
+        NSURL *pathUrl = [NSURL fileURLWithPath:path];
+        
+        [self checkCollection:pathUrl insertImage:nil intoAlbumNamed:albumName];
+    }];
 }
-- (void)insertVideoUrl:(NSURL*)videoUrl insertImage:(UIImage *)image intoAlbumNamed:(NSString *)albumName {
+- (void)checkCollection:(NSURL*)videoUrl insertImage:(UIImage *)image intoAlbumNamed:(NSString *)albumName {
     if (albumName == nil) {
-        [self insertVideoUrl:videoUrl insertImage:image intoAssetCollection: nil];
+        [self insertAsset:videoUrl insertImage:image intoAssetCollection: nil];
     } else {
         //Fetch a collection in the photos library that has the title "albumName"
         PHAssetCollection *collection = [self fetchAssetCollectionWithAlbumName: albumName];
@@ -68,12 +70,12 @@
                 if (success) {
                     //Fetch the newly created collection (which we *assume* exists here)
                     PHAssetCollection *newCollection = [self fetchAssetCollectionWithAlbumName:albumName];
-                    [self insertVideoUrl:videoUrl insertImage:image intoAssetCollection: newCollection];
+                    [self insertAsset:videoUrl insertImage:image intoAssetCollection: newCollection];
                 }
             }];
         } else {
             //If we found the existing AssetCollection with the title "albumName", insert into it
-            [self insertVideoUrl:videoUrl insertImage:image intoAssetCollection: collection];
+            [self insertAsset:videoUrl insertImage:image intoAssetCollection: collection];
         }
     }
 }
@@ -90,7 +92,7 @@
     return fetchResult.firstObject;
 }
 
-- (void)insertVideoUrl:(NSURL *)videoUrl insertImage:(UIImage *)image intoAssetCollection:(PHAssetCollection *)collection {
+- (void)insertAsset:(NSURL *)videoUrl insertImage:(UIImage *)image intoAssetCollection:(PHAssetCollection *)collection {
     [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
         __block PHAssetCreationRequest *creationRequest;
         //This will request a PHAsset be created for the URL
