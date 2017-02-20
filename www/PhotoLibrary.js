@@ -44,7 +44,7 @@ PhotoLibrary.imageFromBase64 = function (options, successCallback, failureCallba
 PhotoLibrary.imageFromUrl = function (options, successCallback, failureCallback) {
 
   var defaults = {
-    url: options.url, //required
+    url: encodeURI(options.url), //required
     albumName: null,
   }
 
@@ -60,7 +60,7 @@ PhotoLibrary.imageFromUrl = function (options, successCallback, failureCallback)
 PhotoLibrary.videoFromUrl = function (options, successCallback, failureCallback) {
 
   var defaults = {
-    url: options.url, //required
+    url: encodeURI(options.url), //required
     albumName: null,
   }
 
