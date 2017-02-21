@@ -1,75 +1,74 @@
-function PhotoLibrary() {
-}
+cordova.define("cordova-photo-library.PhotoLibrary", function(require, exports, module) {
+  function PhotoLibrary() {
+  };
 
-PhotoLibrary.imageFromImage = function (options, successCallback, failureCallback) {
-  var imgElm = options.imgElm;
-  if (!imgElm.complete) {
-    failureCallback && failureCallback('Image has not been loaded')
-    return
-  }
+  function setupDefaults(options) {
 
-  var canvas = document.createElement('canvas')
-  var ctx = canvas.getContext('2d')
-  var devicePixelRatio = window.devicePixelRatio || 1
-  var backingStoreRatio = ctx.webkitBackingStorePixelRatio || 1
-  var ratio = devicePixelRatio / backingStoreRatio
+    var defaults = {
+      url: encodeURI(options.url), //required
+      albumName: null,
+    };
 
-  canvas.width = imgElm.naturalWidth * ratio
-  canvas.height = imgElm.naturalHeight * ratio
-  ctx.scale(ratio, ratio)
+    for (var key in defaults) {
+      if (typeof options[key] !== "undefined" && key !== 'url') {
+        defaults[key] = options[key];
+      }
+    }
 
-  ctx.drawImage(imgElm, 0, 0, img.naturalWidth, img.naturalHeight)
+    return defaults;
+  };
 
-  var options = {
-    canvas: canvas,
-  }
+  PhotoLibrary.imageFromImage = function (options, successCallback, failureCallback) {
+    var imgElm = options.imgElm;
+    if (!imgElm.complete) {
+      failureCallback && failureCallback('Image has not been loaded')
+      return
+    }
 
-  return PhotoLibrary.imageFromCanvas(options)
-}
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    var devicePixelRatio = window.devicePixelRatio || 1;
+    var backingStoreRatio = ctx.webkitBackingStorePixelRatio || 1;
+    var ratio = devicePixelRatio / backingStoreRatio;
 
-PhotoLibrary.imageFromCanvas = function (options, successCallback, failureCallback) {
+    canvas.width = imgElm.naturalWidth * ratio;
+    canvas.height = imgElm.naturalHeight * ratio;
+    ctx.scale(ratio, ratio);
 
-  options['url'] = options.canvas.toDataURL().replace(/data:image\/png;base64,/, '');
+    ctx.drawImage(imgElm, 0, 0, img.naturalWidth, img.naturalHeight);
 
-  return PhotoLibrary.imageFromBase64(options, successCallback, failureCallback)
-}
+    var options = {
+      canvas: canvas,
+    };
 
-PhotoLibrary.imageFromBase64 = function (options, successCallback, failureCallback) {
+    return PhotoLibrary.imageFromCanvas(options)
+  },
 
-  options['url'] = 'data:;base64,' + options.base64Str;
+  PhotoLibrary.imageFromCanvas = function (options, successCallback, failureCallback) {
 
-  return PhotoLibrary.imageFromUrl(options, successCallback, failureCallback)
-}
+    options['url'] = options.canvas.toDataURL().replace(/data:image\/png;base64,/, '');
 
-PhotoLibrary.imageFromUrl = function (options, successCallback, failureCallback) {
+    return PhotoLibrary.imageFromBase64(options, successCallback, failureCallback)
+  },
 
-  var defaults = {
-    url: encodeURI(options.url), //required
-    albumName: null,
-  }
+  PhotoLibrary.imageFromBase64 = function (options, successCallback, failureCallback) {
 
-  for (var key in defaults) {
-    if (typeof options[key] !== "undefined")
-      defaults[key] = options[key];
-  }
+    options['url'] = 'data:;base64,' + options.base64Str;
 
-  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'imageFromUrl', [defaults])
-}
+    return PhotoLibrary.imageFromUrl(options, successCallback, failureCallback)
+  },
+
+  PhotoLibrary.imageFromUrl = function (options, successCallback, failureCallback) {
+
+    return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'imageFromUrl', [setupDefaults(options)])
+  },
 
 //noinspection Eslint
-PhotoLibrary.videoFromUrl = function (options, successCallback, failureCallback) {
+  PhotoLibrary.videoFromUrl = function (options, successCallback, failureCallback) {
 
-  var defaults = {
-    url: encodeURI(options.url), //required
-    albumName: null,
-  }
+    return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'videoFromUrl', [setupDefaults(options)])
+  },
 
-  for (var key in defaults) {
-    if (typeof options[key] !== "undefined")
-      defaults[key] = options[key];
-  }
+  module.exports = PhotoLibrary
 
-  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'videoFromUrl', [defaults])
-}
-
-module.exports = PhotoLibrary
+});
