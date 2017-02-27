@@ -1,48 +1,47 @@
-cordova.define("cordova-photo-library.PhotoLibrary", function(require, exports, module) {
-  function PhotoLibrary() {
+function PhotoLibrary() {
+};
+
+function setupDefaults(options) {
+
+  var defaults = {
+    url: encodeURI(options.url), //required
+    albumName: null,
   };
 
-  function setupDefaults(options) {
-
-    var defaults = {
-      url: encodeURI(options.url), //required
-      albumName: null,
-    };
-
-    for (var key in defaults) {
-      if (typeof options[key] !== "undefined" && key !== 'url') {
-        defaults[key] = options[key];
-      }
+  for (var key in defaults) {
+    if (typeof options[key] !== "undefined" && key !== 'url') {
+      defaults[key] = options[key];
     }
+  }
 
-    return defaults;
+  return defaults;
+};
+
+PhotoLibrary.imageFromImage = function (options, successCallback, failureCallback) {
+  var imgElm = options.imgElm;
+  if (!imgElm.complete) {
+    failureCallback && failureCallback('Image has not been loaded')
+    return
+  }
+
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  var devicePixelRatio = window.devicePixelRatio || 1;
+  var backingStoreRatio = ctx.webkitBackingStorePixelRatio || 1;
+  var ratio = devicePixelRatio / backingStoreRatio;
+
+  canvas.width = imgElm.naturalWidth * ratio;
+  canvas.height = imgElm.naturalHeight * ratio;
+  ctx.scale(ratio, ratio);
+
+  ctx.drawImage(imgElm, 0, 0, img.naturalWidth, img.naturalHeight);
+
+  var options = {
+    canvas: canvas,
   };
 
-  PhotoLibrary.imageFromImage = function (options, successCallback, failureCallback) {
-    var imgElm = options.imgElm;
-    if (!imgElm.complete) {
-      failureCallback && failureCallback('Image has not been loaded')
-      return
-    }
-
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
-    var devicePixelRatio = window.devicePixelRatio || 1;
-    var backingStoreRatio = ctx.webkitBackingStorePixelRatio || 1;
-    var ratio = devicePixelRatio / backingStoreRatio;
-
-    canvas.width = imgElm.naturalWidth * ratio;
-    canvas.height = imgElm.naturalHeight * ratio;
-    ctx.scale(ratio, ratio);
-
-    ctx.drawImage(imgElm, 0, 0, img.naturalWidth, img.naturalHeight);
-
-    var options = {
-      canvas: canvas,
-    };
-
-    return PhotoLibrary.imageFromCanvas(options)
-  },
+  return PhotoLibrary.imageFromCanvas(options)
+},
 
   PhotoLibrary.imageFromCanvas = function (options, successCallback, failureCallback) {
 
@@ -71,4 +70,4 @@ cordova.define("cordova-photo-library.PhotoLibrary", function(require, exports, 
 
   module.exports = PhotoLibrary
 
-});
+
