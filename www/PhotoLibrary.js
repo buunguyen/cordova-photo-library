@@ -1,41 +1,73 @@
-function PhotoLibrary() {}
+function PhotoLibrary() {
+};
 
-PhotoLibrary.imageFromImage = function (imgElm, successCallback, failureCallback) {
+function setupDefaults(options) {
+
+  var defaults = {
+    url: encodeURI(options.url), //required
+    albumName: null,
+  };
+
+  for (var key in defaults) {
+    if (typeof options[key] !== "undefined" && key !== 'url') {
+      defaults[key] = options[key];
+    }
+  }
+
+  return defaults;
+};
+
+PhotoLibrary.imageFromImage = function (options, successCallback, failureCallback) {
+  var imgElm = options.imgElm;
   if (!imgElm.complete) {
     failureCallback && failureCallback('Image has not been loaded')
     return
   }
 
-  var canvas = document.createElement('canvas')
-  var ctx = canvas.getContext('2d')
-  var devicePixelRatio = window.devicePixelRatio || 1
-  var backingStoreRatio = ctx.webkitBackingStorePixelRatio || 1
-  var ratio = devicePixelRatio / backingStoreRatio
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  var devicePixelRatio = window.devicePixelRatio || 1;
+  var backingStoreRatio = ctx.webkitBackingStorePixelRatio || 1;
+  var ratio = devicePixelRatio / backingStoreRatio;
 
-  canvas.width = imgElm.naturalWidth * ratio
-  canvas.height = imgElm.naturalHeight * ratio
-  ctx.scale(ratio, ratio)
+  canvas.width = imgElm.naturalWidth * ratio;
+  canvas.height = imgElm.naturalHeight * ratio;
+  ctx.scale(ratio, ratio);
 
-  ctx.drawImage(imgElm, 0, 0, img.naturalWidth, img.naturalHeight)
+  ctx.drawImage(imgElm, 0, 0, img.naturalWidth, img.naturalHeight);
 
-  return PhotoLibrary.imageFromCanvas(canvas)
-}
+  var options = {
+    canvas: canvas,
+  };
 
-PhotoLibrary.imageFromCanvas = function (canvas, successCallback, failureCallback) {
-  var base64Str = canvas.toDataURL().replace(/data:image\/png;base64,/,'')
-  return PhotoLibrary.imageFromBase64(base64Str, successCallback, failureCallback)
-}
+  return PhotoLibrary.imageFromCanvas(options)
+},
 
-PhotoLibrary.imageFromBase64 = function (base64Str, successCallback, failureCallback) {
-  return PhotoLibrary.imageFromUrl('data:;base64,' + base64Str, successCallback, failureCallback)
-}
+  PhotoLibrary.imageFromCanvas = function (options, successCallback, failureCallback) {
 
-PhotoLibrary.imageFromUrl = function (url, successCallback, failureCallback) {
-  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'imageFromUrl', [url])
-}
+    options['url'] = options.canvas.toDataURL().replace(/data:image\/png;base64,/, '');
 
-PhotoLibrary.videoFromUrl = function (url, successCallback, failureCallback) {
-  return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'videoFromUrl', [url])
-}
+    return PhotoLibrary.imageFromBase64(options, successCallback, failureCallback)
+  },
 
-module.exports = PhotoLibrary
+  PhotoLibrary.imageFromBase64 = function (options, successCallback, failureCallback) {
+
+    options['url'] = 'data:;base64,' + options.base64Str;
+
+    return PhotoLibrary.imageFromUrl(options, successCallback, failureCallback)
+  },
+
+  PhotoLibrary.imageFromUrl = function (options, successCallback, failureCallback) {
+
+    return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'imageFromUrl', [setupDefaults(options)])
+  },
+
+//noinspection Eslint
+  PhotoLibrary.videoFromUrl = function (options, successCallback, failureCallback) {
+
+    return cordova.exec(successCallback, failureCallback, 'PhotoLibrary', 'videoFromUrl', [setupDefaults(options)])
+  },
+
+  module.exports = PhotoLibrary
+
+

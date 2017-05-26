@@ -1,38 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
-  id="com.buunguyen.PhotoLibrary"
-  version="0.2.0">
+        id="cordova-photo-library"
+        version="1.1.4">
 
-  <name>PhotoLibrary</name>
-  <author>Buu Nguyen</author>
+    <name>PhotoLibrary</name>
 
-  <description>
-    This plugin supports saving images and videos to photo library.
-    Currently support iOS only.
-  </description>
-  <keywords>photo library,images</keywords>
+    <description>
+        This plugin supports saving images and videos to photo library.
+        Currently support iOS only.
+    </description>
 
-  <license>MIT</license>
-  <repo>https://github.com/buunguyen/cordova-photo-library.git</repo>
+    <keywords>cordova,phonegap,datepicker,photo library,images,videos,ios</keywords>
+    <keywords>photo library,images</keywords>
 
-  <engines>
-    <engine name="cordova" version=">=3.0.0" />
-  </engines>
+    <license>MIT</license>
+    <repo>https://github.com/CoSchedule/cordova-photo-library.git</repo>
 
-  <js-module src="www/PhotoLibrary.js" name="PhotoLibrary">
-    <clobbers target="cordova.plugins.PhotoLibrary" />
-  </js-module>
+    <engines>
+        <engine name="cordova" version=">=3.0.0"/>
+    </engines>
 
-  <platform name="ios">
-    <config-file target="config.xml" parent="/*">
-      <feature name="PhotoLibrary">
-        <param name="ios-package" value="PhotoLibrary" onload="true" />
-      </feature>
-    </config-file>
+    <js-module src="www/PhotoLibrary.js" name="PhotoLibrary">
+        <clobbers target="cordova.plugins.PhotoLibrary"/>
+    </js-module>
 
-    <header-file src="src/ios/PhotoLibrary.h" />
-    <source-file src="src/ios/PhotoLibrary.m" compiler-flags="-fno-objc-arc" />
-    <framework src="AssetsLibrary.framework" />
-  </platform>
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="PhotoLibrary">
+                <param name="ios-package" value="PhotoLibrary" onload="true"/>
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/PhotoLibrary.h"/>
+        <source-file src="src/ios/PhotoLibrary.m" compiler-flags="-fno-objc-arc"/>
+        <framework src="Photos.framework"/>
+    </platform>
 </plugin>

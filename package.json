@@ -1,0 +1,38 @@
+{
+  "name": "cordova-photo-library",
+  "version": "1.1.4",
+  "description": "\n        This plugin supports saving images and videos to photo library.\n        Currently support iOS only.\n    ",
+  "cordova": {
+    "id": "cordova-photo-library",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoSchedule/cordova-photo-library.git"
+  },
+  "keywords": [
+    "cordova",
+    "phonegap",
+    "datepicker",
+    "photo library",
+    "images",
+    "videos",
+    "ios",
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    }
+  ],
+  "author": "CoSchedule",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CoSchedule/cordova-photo-library/issues"
+  },
+  "homepage": "https://github.com/CoSchedule/cordova-photo-library#readme"
+}
