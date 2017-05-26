@@ -14,6 +14,11 @@
     [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
 }
 
+- (void)sendError:(NSError *)error {
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
+    [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+}
+
 - (void)imageFromUrl:(CDVInvokedUrlCommand *) command
 {
     [self.commandDelegate runInBackground:^{
@@ -64,7 +69,7 @@
             } completionHandler:^(BOOL success, NSError * _Nullable error) {
                 if (error != nil) {
                     NSLog(@"Error inserting media into album: %@", error.localizedDescription);
-                    [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
+                    [self sendError:error];
                 }
 
                 if (success) {
@@ -117,7 +122,7 @@
     } completionHandler:^(BOOL success, NSError * _Nullable error) {
         if (error != nil) {
             NSLog(@"Error inserting image into asset collection: %@", error.localizedDescription);
-            [CDVPluginResult resultWithStatus: CDVCommandStatus_ERROR messageAsString:error.description];
+            [self sendError:error];
         }
         if (success){
             [self sendResult:self.localId];
