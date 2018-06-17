@@ -16,7 +16,7 @@ PhotoLibrary.imageFromImage = function (imgElm, successCallback, failureCallback
   canvas.height = imgElm.naturalHeight * ratio
   ctx.scale(ratio, ratio)
 
-  ctx.drawImage(imgElm, 0, 0, img.naturalWidth, img.naturalHeight)
+  ctx.drawImage(imgElm, 0, 0, imgElm.naturalWidth, imgElm.naturalHeight)
 
   return PhotoLibrary.imageFromCanvas(canvas)
 }
